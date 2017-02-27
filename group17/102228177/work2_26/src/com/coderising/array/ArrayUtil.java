@@ -1,5 +1,10 @@
 package com.coderising.array;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 public class ArrayUtil {
 	
 	/**
@@ -9,8 +14,22 @@ public class ArrayUtil {
 	 * @param origin
 	 * @return
 	 */
-	public void reverseArray(int[] origin){
+	public void reverseArray(int[] origin){ 
+		for (int i = 0; i < origin.length/2; i++) {
+			int temp = origin[i];
+			origin[i] = origin[origin.length-i-1];
+			origin[origin.length-i-1] = temp;
+		}
+	}
+	
+	public static void main(String[] args) {
+		ArrayUtil util = new ArrayUtil();
+		int[] origin = new int[]{1,3,4,5,0,0,6,6,0,5,4,7,6,7,0,5};
+//		System.out.println(Arrays.toString(util.removeZero(origin)));
 		
+		int[] a1 = {3, 5, 7,8};
+		int[] a2 = {4, 5, 6,7};
+		System.out.println(Arrays.toString(util.merge(a1, a2)));
 	}
 	
 	/**
@@ -22,7 +41,15 @@ public class ArrayUtil {
 	 */
 	
 	public int[] removeZero(int[] oldArray){
-		return null;
+		int[] newArray = new int[oldArray.length];
+		int j = 0;
+		for (int i = 0; i < oldArray.length; i++) {
+			if(oldArray[i] != 0){
+				newArray[j] = oldArray[i];
+				j++;
+			}
+		}
+		return Arrays.copyOf(newArray, j);
 	}
 	
 	/**
@@ -34,9 +61,32 @@ public class ArrayUtil {
 	 */
 	
 	public int[] merge(int[] array1, int[] array2){
-		return  null;
+		
+		  //Set是不允许重复的，所以将数组的值全部放在Set对象中  
+        Set set = new HashSet<Integer>();  
+          
+        for(int i = 0; i < array1.length ; i++){  
+            set.add(array1[i]);  
+        }  
+          
+        for(int i = 0; i < array2.length ; i++){  
+            set.add(array2[i]);  
+        }  
+        
+        Iterator i = set.iterator();  
+        int[] arrays = new int[set.size()];  
+        int num=0;  
+        while(i.hasNext()){  
+            int a = (Integer)i.next();  
+            arrays[num] = a;  
+            num = num + 1;  
+        }  
+          
+        //对结果进行排序  
+        Arrays.sort(arrays);
+        return arrays;
 	}
-	/**
+	/** 
 	 * 把一个已经存满数据的数组 oldArray的容量进行扩展， 扩展后的新数据大小为oldArray.length + size
 	 * 注意，老数组的元素在新数组中需要保持
 	 * 例如 oldArray = [2,3,6] , size = 3,则返回的新数组为
