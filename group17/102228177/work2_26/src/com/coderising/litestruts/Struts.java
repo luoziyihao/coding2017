@@ -1,8 +1,11 @@
 package com.coderising.litestruts;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
-
+import org.dom4j.Element;
 
 public class Struts {
 
@@ -27,8 +30,48 @@ public class Struts {
 		放到View对象的jsp字段中。
         
         */
-    	
+    	String path = Struts.class.getResource("").getPath()+"struts.xml";
+		Element element = Dom4jUtil.parseXml(path);
+		Map<String, String> attribute = Dom4jUtil.getAttribute(element);
+		String className = attribute.get(actionName);
+		try {
+			Class<?> clazz = Class.forName(className);
+			Object o = clazz.newInstance();
+			for (Map.Entry<String, String> entry : parameters.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				Field field = clazz.getDeclaredField(key);
+				Method method = clazz.getDeclaredMethod(BeanUtil.setter(field.getName()),String.class);
+				method.invoke(o, value);
+			}
+			Method method = clazz.getDeclaredMethod("execute");
+			String str = (String) method.invoke(o);
+			Field[] fields = clazz.getDeclaredFields();
+			Map<String, String> map = new HashMap<String, String>();
+			for (Field field : fields) {
+				String fieldName = field.getName();
+				Method method2 =  clazz.getDeclaredMethod(BeanUtil.getter(fieldName));
+				String ret = (String) method2.invoke(o);
+				map.put(fieldName, ret);
+			}
+			View view = new View();
+			view.setParameters(map);
+			Map<String, String> result = Dom4jUtil.getJspMap(element, actionName);
+			view.setJsp(result.get(str));
+			return view;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	return null;
     }    
-
+    
+   public static void main(String[] args) {
+	   String actionName = "login";
+	   Map<String,String> params = new HashMap<String,String>();
+       params.put("name","test");
+       params.put("password","1234");
+       runAction(actionName, params);
+   }
 }
