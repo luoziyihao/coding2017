@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/Ren650119726/coding2017.git/!svn/ver/386/trunk/group17/102228177/src/com/coderising/download/api
+END
+ConnectionManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/Ren650119726/coding2017.git/!svn/ver/386/trunk/group17/102228177/src/com/coderising/download/api/ConnectionManager.java
+END
+Connection.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/Ren650119726/coding2017.git/!svn/ver/386/trunk/group17/102228177/src/com/coderising/download/api/Connection.java
+END
+DownloadListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/Ren650119726/coding2017.git/!svn/ver/386/trunk/group17/102228177/src/com/coderising/download/api/DownloadListener.java
+END
+ConnectionException.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/Ren650119726/coding2017.git/!svn/ver/386/trunk/group17/102228177/src/com/coderising/download/api/ConnectionException.java
+END
