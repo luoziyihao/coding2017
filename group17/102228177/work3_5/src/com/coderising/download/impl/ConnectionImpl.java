@@ -2,7 +2,6 @@ package com.coderising.download.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -12,8 +11,8 @@ public class ConnectionImpl implements Connection{
 	
 	private URL url;
 	private HttpURLConnection con;
-	private RandomAccessFile file;
 	private InputStream is;
+	
 	public ConnectionImpl(String urlPath) {
 		try {
 			//声明URL
@@ -22,10 +21,6 @@ public class ConnectionImpl implements Connection{
 			con = (HttpURLConnection) url.openConnection();
 			//设置请求方式
 			con.setRequestMethod("GET");
-		    //在指定的目录下，创建一个同等大小的文件
-	        file = new RandomAccessFile("d:/testDown", "rw");//创建一个相同大小的文件。
-	        //设置文件大小，占位
-	        file.setLength(getContentLength());
 	        is = con.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -41,9 +36,9 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public byte[] read(int startPos, int endPos) throws IOException {
-		
-		
-		return null;
+		byte[] buf = new byte[endPos-startPos];
+		is.read(buf, startPos, startPos);
+		return buf;
 	}
 	/**
 	 * 得到数据内容的长度
@@ -51,8 +46,19 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public int getContentLength() {
+		int code;
+		try {
+			code = con.getResponseCode();
+			if (code==200){
+				//服务器返回内容的长度，本质就是文件的长度
+				return con.getContentLength();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		return con.getContentLength();
+		return 0;
 	}
 
 	/**
@@ -60,13 +66,7 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public void close() {
-		if(file != null){
-			try {
-				file.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		
 		if(is != null){
 			try {
 				is.close();
@@ -75,5 +75,4 @@ public class ConnectionImpl implements Connection{
 			}
 		}
 	}
-
 }

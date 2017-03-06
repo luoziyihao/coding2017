@@ -21,7 +21,7 @@ public class FileDownloaderTest {
 	@Test
 	public void testDownload() {
 		
-		String url = "http://localhost:8080/test.jpg";
+		String url = "http://img05.tooopen.com/images/20140919/sy_71272488121.jpg";
 		
 		FileDownloader downloader = new FileDownloader(url);
 
