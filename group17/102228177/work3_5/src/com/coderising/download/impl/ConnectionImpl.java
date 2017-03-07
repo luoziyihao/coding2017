@@ -1,7 +1,9 @@
 package com.coderising.download.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -9,18 +11,18 @@ import com.coderising.download.api.Connection;
 
 public class ConnectionImpl implements Connection{
 	
-	private URL url;
-	private HttpURLConnection con;
+	public HttpURLConnection con;
 	private InputStream is;
+	private RandomAccessFile out;
 	
 	public ConnectionImpl(String urlPath) {
 		try {
 			//声明URL
-			this.url = new URL(urlPath);
+			URL	url = new URL(urlPath);
 			//获取链接
 			con = (HttpURLConnection) url.openConnection();
-			//设置请求方式
 			con.setRequestMethod("GET");
+			//获取输入流
 	        is = con.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -36,9 +38,22 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public byte[] read(int startPos, int endPos) throws IOException {
-		byte[] buf = new byte[endPos-startPos];
-		is.read(buf, startPos, startPos);
-		return buf;
+		
+		 //设置分段下载的请求头
+
+//        con.setRequestProperty("Range","bytes="+startPos+"-"+startPos);//设置从服务器上读取的文件块。
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        byte[] b=new byte[1024];
+
+        int len = 0;
+
+        while((len=is.read(b))!=-1){
+        	outputStream.write(b,0,len);
+        }
+       
+        return outputStream.toByteArray();
 	}
 	/**
 	 * 得到数据内容的长度
@@ -54,7 +69,6 @@ public class ConnectionImpl implements Connection{
 				return con.getContentLength();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -66,10 +80,16 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public void close() {
-		
 		if(is != null){
 			try {
 				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if(out != null){
+			try {
+				out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
