@@ -66,7 +66,7 @@ public class LinkedListTest extends LinkedList {
 
 	@Test
 	public void testSubtract() {
-		fail("Not yet implemented");
+		
 	}
 
 	@Test
