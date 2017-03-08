@@ -39,10 +39,21 @@ public class FileDownloader {
 			
 			conn = cm.open(this.url);
 			
-			int length = conn.getContentLength();	
+			int length = conn.getContentLength();
 			
-			new DownloadThread(conn,0,length-1).start();
+			//定义线程个数
+			int size = 3;
+
+			//计算每一个线程应该下载多少字节的数据，如果正好整除则最好，否则加1
+	        int block = length/size==0?length/size:length/size+1;
 			
+	        for (int i = 0; i < size; i++) {
+				int startPos = block*i;
+				int endPos = startPos+(block-1);
+				new DownloadThread(conn,startPos,endPos).start();
+			}
+//	        listener.notifyFinished();
+	        
 		} catch (ConnectionException e) {			
 			e.printStackTrace();
 		}finally{
@@ -50,10 +61,6 @@ public class FileDownloader {
 				conn.close();
 			}
 		}
-		
-		
-		
-		
 	}
 	
 	public void setListener(DownloadListener listener) {

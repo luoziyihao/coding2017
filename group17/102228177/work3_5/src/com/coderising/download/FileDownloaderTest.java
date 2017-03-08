@@ -25,7 +25,6 @@ public class FileDownloaderTest {
 		
 		FileDownloader downloader = new FileDownloader(url);
 
-	
 		ConnectionManager cm = new ConnectionManagerImpl();
 		downloader.setConnectionManager(cm);
 		
@@ -34,7 +33,6 @@ public class FileDownloaderTest {
 			public void notifyFinished() {
 				downloadFinished = true;
 			}
-
 		});
 
 		
@@ -52,8 +50,6 @@ public class FileDownloaderTest {
 		}
 		System.out.println("下载完成！");
 		
-		
-
 	}
 
 }

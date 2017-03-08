@@ -3,7 +3,6 @@ package com.coderising.download.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -11,19 +10,12 @@ import com.coderising.download.api.Connection;
 
 public class ConnectionImpl implements Connection{
 	
-	public HttpURLConnection con;
+	private URL url;
 	private InputStream is;
-	private RandomAccessFile out;
 	
 	public ConnectionImpl(String urlPath) {
 		try {
-			//声明URL
-			URL	url = new URL(urlPath);
-			//获取链接
-			con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-			//获取输入流
-	        is = con.getInputStream();
+			url = new URL(urlPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -38,22 +30,32 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public byte[] read(int startPos, int endPos) throws IOException {
-		
-		 //设置分段下载的请求头
-
-//        con.setRequestProperty("Range","bytes="+startPos+"-"+startPos);//设置从服务器上读取的文件块。
+		//每次都需要重新获取链接 采用局部变量是为了防止出现线程同步
+		HttpURLConnection con = getCon();
+		//设置分段下载的请求头
+        con.setRequestProperty("Range","bytes="+startPos+"-"+endPos);//设置从服务器上读取的文件块。
         
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        
-        byte[] b=new byte[1024];
+        if(con.getResponseCode() == 206){
+        	 is = con.getInputStream();
+             
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             
+             byte[] b = new byte[1024];
 
-        int len = 0;
+             int len = 0;
 
-        while((len=is.read(b))!=-1){
-        	outputStream.write(b,0,len);
+             while((len = is.read(b)) != -1){
+             	outputStream.write(b ,0 ,len);
+             }
+             
+             outputStream.close();
+             
+             close();
+             
+             return outputStream.toByteArray();
         }
-       
-        return outputStream.toByteArray();
+        
+        return new byte[]{};
 	}
 	/**
 	 * 得到数据内容的长度
@@ -61,17 +63,15 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public int getContentLength() {
-		int code;
+		HttpURLConnection con = getCon();
 		try {
-			code = con.getResponseCode();
-			if (code==200){
+			if (con.getResponseCode() == 200){
 				//服务器返回内容的长度，本质就是文件的长度
 				return con.getContentLength();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		return 0;
 	}
 
@@ -87,12 +87,24 @@ public class ConnectionImpl implements Connection{
 				e.printStackTrace();
 			}
 		}
-		if(out != null){
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		
+	}
+
+
+	/**
+	 * 获取HttpURLConnection链接
+	 * @return
+	 */
+	public HttpURLConnection getCon() {
+		HttpURLConnection con = null;
+		try {
+			//获取链接
+			con = (HttpURLConnection) url.openConnection();
+			con.setReadTimeout(5000);
+			con.setRequestMethod("GET");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return con;
 	}
 }
