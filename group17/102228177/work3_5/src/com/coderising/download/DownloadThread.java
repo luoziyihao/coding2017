@@ -27,8 +27,10 @@ public class DownloadThread extends Thread{
             out = new RandomAccessFile("d:/test.jpg","rwd");
             
 			out.seek(startPos);//设置从文件的某个位置开始写数据。 
-			  
-			out.write(conn.read(startPos, endPos));
+			
+			synchronized (DownloadThread.class) {
+				out.write(conn.read(startPos, endPos));
+			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();

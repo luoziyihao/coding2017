@@ -1,5 +1,8 @@
 package com.coderising.download;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.coderising.download.api.Connection;
 import com.coderising.download.api.ConnectionException;
 import com.coderising.download.api.ConnectionManager;
@@ -18,6 +21,18 @@ public class FileDownloader {
 	public FileDownloader(String _url) {
 		this.url = _url;
 		
+	}
+	
+	public void setListener(DownloadListener listener) {
+		this.listener = listener;
+	}
+
+	public void setConnectionManager(ConnectionManager ucm){
+		this.cm = ucm;
+	}
+	
+	public DownloadListener getListener(){
+		return this.listener;
 	}
 	
 	public void execute(){
@@ -40,21 +55,35 @@ public class FileDownloader {
 			conn = cm.open(this.url);
 			
 			int length = conn.getContentLength();
-			
+//			new DownloadThread(conn,0,length-1).start();
 			//定义线程个数
 			int size = 3;
-
+			
+			//线程池
+			ExecutorService exe = Executors.newFixedThreadPool(size);
+			
 			//计算每一个线程应该下载多少字节的数据，如果正好整除则最好，否则加1
 	        int block = length/size==0?length/size:length/size+1;
 			
 	        for (int i = 0; i < size; i++) {
 				int startPos = block*i;
 				int endPos = startPos+(block-1);
-				new DownloadThread(conn,startPos,endPos).start();
+				exe.execute(new DownloadThread(conn,startPos,endPos));
 			}
-//	        listener.notifyFinished();
+	        
+	        exe.shutdown();  
+	        
+	        while (true) {  
+	            if (exe.isTerminated()) {
+	            	listener.notifyFinished();
+	                break;  
+	            } 
+	            Thread.sleep(200);
+	        }  
 	        
 		} catch (ConnectionException e) {			
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
 			if(conn != null){
@@ -62,19 +91,4 @@ public class FileDownloader {
 			}
 		}
 	}
-	
-	public void setListener(DownloadListener listener) {
-		this.listener = listener;
-	}
-
-	
-	
-	public void setConnectionManager(ConnectionManager ucm){
-		this.cm = ucm;
-	}
-	
-	public DownloadListener getListener(){
-		return this.listener;
-	}
-	
 }

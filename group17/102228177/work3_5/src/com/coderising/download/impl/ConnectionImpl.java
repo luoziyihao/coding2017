@@ -31,7 +31,7 @@ public class ConnectionImpl implements Connection{
 	@Override
 	public byte[] read(int startPos, int endPos) throws IOException {
 		//每次都需要重新获取链接 采用局部变量是为了防止出现线程同步
-		HttpURLConnection con = getCon();
+		HttpURLConnection con = getConnection();
 		//设置分段下载的请求头
         con.setRequestProperty("Range","bytes="+startPos+"-"+endPos);//设置从服务器上读取的文件块。
         
@@ -63,7 +63,7 @@ public class ConnectionImpl implements Connection{
 	 */
 	@Override
 	public int getContentLength() {
-		HttpURLConnection con = getCon();
+		HttpURLConnection con = getConnection();
 		try {
 			if (con.getResponseCode() == 200){
 				//服务器返回内容的长度，本质就是文件的长度
@@ -95,7 +95,7 @@ public class ConnectionImpl implements Connection{
 	 * 获取HttpURLConnection链接
 	 * @return
 	 */
-	public HttpURLConnection getCon() {
+	public HttpURLConnection getConnection() {
 		HttpURLConnection con = null;
 		try {
 			//获取链接

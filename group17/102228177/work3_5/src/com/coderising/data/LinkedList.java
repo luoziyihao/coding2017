@@ -1,6 +1,7 @@
 package com.coderising.data;
 
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public class LinkedList implements List {
@@ -66,16 +67,18 @@ public class LinkedList implements List {
 			throw new IndexOutOfBoundsException();
 		}else{
 			if(head != null){
-				Node p = head;
 				int k = 0;
-				while(k > index-1 && p.next != null){
+				Node p = head;
+				while(k < index-1 && p!=null){
 					k++;
-					p = p.next; 
+					p = p.next;
 				}
-				Node next = p.next;
-				p.next = next.next;
-				size--;
-				return next.data;
+				Node pn = p.next;
+				if(pn != null){
+					p.next = pn.next;
+					size--;
+					return pn.data;
+				}
 			}
 		}
 		return null;
@@ -145,17 +148,36 @@ public class LinkedList implements List {
 	 * 把该链表逆置
 	 * 例如链表为 3->7->10 , 逆置后变为  10->7->3
 	 */
-	public  void reverse(){		
-		
+	public void reverse(){	
+		if(null == head || null == head.next){  
+		    return;  
+		}  
+		else{
+			Node pre = head;
+			Node cur = head.next;
+			Node next;
+			while(cur != null){
+				next = cur.next;
+				cur.next = pre;
+				pre = cur;
+				cur = next;
+			}
+			head.next = null;
+			head = pre;
+		}
 	}
+	
 	
 	/**
 	 * 删除一个单链表的前半部分
 	 * 例如：list = 2->5->7->8 , 删除以后的值为 7->8
 	 * 如果list = 2->5->7->8->10 ,删除以后的值为7,8,10
 	 */
-	public  void removeFirstHalf(){
-		
+	public void removeFirstHalf(){
+		int num = size/2;
+		for (int i = 0; i < num; i++) {
+			removeFirst();
+		}
 	}
 	
 	/**
@@ -163,8 +185,17 @@ public class LinkedList implements List {
 	 * @param i
 	 * @param length
 	 */
-	public  void remove(int i, int length){
-		
+	public void remove(int i, int length){
+		if(i <0 || i >= size){
+			throw new IndexOutOfBoundsException();
+		}else{
+			int len = size-i>=length ? length :size-i;
+			int k = 0;
+			while(k < len){
+				remove(i);
+				k++;
+			}
+		}
 	}
 	/**
 	 * 假定当前链表和list均包含已升序排列的整数
@@ -174,8 +205,12 @@ public class LinkedList implements List {
 	 * 返回的结果应该是[101,301,401,601]  
 	 * @param list
 	 */
-	public static int[] getElements(LinkedList list){
-		return null;
+	public int[] getElements(LinkedList list){
+		int[] arr = new int[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			arr[i] = (int) this.get((int) list.get(i));
+		}
+		return arr;
 	}
 	
 	/**
@@ -184,15 +219,43 @@ public class LinkedList implements List {
 	 * @param list
 	 */
 	
-	public  void subtract(LinkedList list){
-		
+	public void subtract(LinkedList list){
+		for (int i = 0; i < list.size(); i++) {
+			this.remove(list.get(i));
+		}
+	}
+
+	/**
+	 * 传入数据删除节点
+	 * @param obj
+	 */
+	public void remove(Object obj){
+		if(head==null){
+			throw new RuntimeException("LinkedList is empty!");
+		}
+		//如果要删除的结点是第一个，则把下一个结点赋值给第一个结点
+		if(head.data==obj){
+			head=head.next;
+			size--;
+		}else{
+			Node pre=head; //上一节点
+			Node cur=head.next; //当前结点
+			while(cur!=null){
+				if(cur.data.equals(obj)){
+					pre.next=cur.next;
+					size--;
+				}
+				pre=pre.next;
+				cur=cur.next;
+			}
+		}
 	}
 	
 	/**
 	 * 已知当前链表中的元素以值递增有序排列，并以单链表作存储结构。
 	 * 删除表中所有值相同的多余元素（使得操作后的线性表中所有元素的值均不相同）
 	 */
-	public  void removeDuplicateValues(){
+	public void removeDuplicateValues(){
 		
 	}
 	
@@ -202,7 +265,7 @@ public class LinkedList implements List {
 	 * @param min
 	 * @param max
 	 */
-	public  void removeRange(int min, int max){
+	public void removeRange(int min, int max){
 		
 	}
 	
@@ -211,7 +274,25 @@ public class LinkedList implements List {
 	 * 现要求生成新链表C，其元素为当前链表和list中元素的交集，且表C中的元素有依值递增有序排列
 	 * @param list
 	 */
-	public  LinkedList intersection( LinkedList list){
+	public LinkedList intersection( LinkedList list){
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		LinkedList linkedList = new LinkedList();
+		linkedList.add(11);
+		linkedList.add(101);
+		linkedList.add(201);
+		linkedList.add(301);
+		linkedList.add(401);
+		linkedList.add(501);
+		linkedList.add(601);
+		linkedList.add(701);
+		LinkedList list = new LinkedList();
+		list.add(1);
+		list.add(3);
+		list.add(4);
+		list.add(6);
+		System.out.println(Arrays.toString(linkedList.getElements(list)));
 	}
 }
