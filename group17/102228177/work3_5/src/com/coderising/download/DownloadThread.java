@@ -2,17 +2,19 @@ package com.coderising.download;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import com.coderising.download.api.Connection;
 
 public class DownloadThread extends Thread{
-
+	private CyclicBarrier barrier;
 	Connection conn;
 	int startPos;
 	int endPos;
 
-	public DownloadThread( Connection conn, int startPos, int endPos){
-		
+	public DownloadThread(CyclicBarrier barrier, Connection conn, int startPos, int endPos){
+		this.barrier = barrier;
 		this.conn = conn;		
 		this.startPos = startPos;
 		this.endPos = endPos;
@@ -31,8 +33,12 @@ public class DownloadThread extends Thread{
 			synchronized (DownloadThread.class) {
 				out.write(conn.read(startPos, endPos));
 			}
-			
+			barrier.await();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}finally {
 			if (out != null) {

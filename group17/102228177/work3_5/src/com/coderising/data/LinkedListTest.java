@@ -71,17 +71,44 @@ public class LinkedListTest extends LinkedList {
 
 	@Test
 	public void testRemoveDuplicateValues() {
-		fail("Not yet implemented");
+		LinkedList list = new LinkedList();
+		list.add(1);
+		list.add(1);
+		list.add(2);
+		list.removeDuplicateValues();
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
 	}
 
 	@Test
 	public void testRemoveRange() {
-		fail("Not yet implemented");
+		LinkedList linkedList = new LinkedList();
+		linkedList.add(11);
+		linkedList.add(12);
+		linkedList.add(13);
+		linkedList.add(14);
+		linkedList.add(16);
+		linkedList.add(16);
+		linkedList.add(19);
+		linkedList.removeRange(10, 14);
 	}
 
 	@Test
 	public void testIntersection() {
-		fail("Not yet implemented");
+		LinkedList list1 = new LinkedList();
+		list1.add(1);
+		list1.add(6);
+		list1.add(7);
+		
+		LinkedList list2 = new LinkedList();
+		list2.add(2);
+		list2.add(5);
+		list2.add(6);
+		
+		LinkedList newList = list1.intersection(list2);
+		for (int i = 0; i < newList.size(); i++) {
+			System.out.println(newList.get(i));
+		}
 	}
-
 }

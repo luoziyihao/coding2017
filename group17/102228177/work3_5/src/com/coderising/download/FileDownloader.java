@@ -1,5 +1,6 @@
 package com.coderising.download;
 
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,6 +11,7 @@ import com.coderising.download.api.DownloadListener;
 
 
 public class FileDownloader {
+	private static final int THREAD_NUM = 3;
 	
 	String url;
 	
@@ -57,7 +59,15 @@ public class FileDownloader {
 			int length = conn.getContentLength();
 //			new DownloadThread(conn,0,length-1).start();
 			//定义线程个数
-			int size = 3;
+			int size = THREAD_NUM;
+			
+			CyclicBarrier barrier = new CyclicBarrier(THREAD_NUM, new Runnable() {
+				
+				@Override
+				public void run() {
+					listener.notifyFinished();
+				}
+			});
 			
 			//线程池
 			ExecutorService exe = Executors.newFixedThreadPool(size);
@@ -68,18 +78,11 @@ public class FileDownloader {
 	        for (int i = 0; i < size; i++) {
 				int startPos = block*i;
 				int endPos = startPos+(block-1);
-				exe.execute(new DownloadThread(conn,startPos,endPos));
+				exe.execute(new DownloadThread(barrier,conn,startPos,endPos));
 			}
 	        
 	        exe.shutdown();  
-	        
-	        while (true) {  
-	            if (exe.isTerminated()) {
-	            	listener.notifyFinished();
-	                break;  
-	            } 
-	            Thread.sleep(200);
-	        }  
+	     
 	        
 		} catch (ConnectionException e) {			
 			e.printStackTrace();

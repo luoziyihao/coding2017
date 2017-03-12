@@ -256,7 +256,29 @@ public class LinkedList implements List {
 	 * 删除表中所有值相同的多余元素（使得操作后的线性表中所有元素的值均不相同）
 	 */
 	public void removeDuplicateValues(){
-		
+		if(head == null){
+			throw new RuntimeException("LinkedList is empty!");
+		}else{
+			Node pre = head;
+			Node cur = head;
+			while(cur.next != null){
+				cur = cur.next;
+				Object data = pre.data;
+				while(cur.data == data){
+					if(cur.next == null){
+						pre.next = null;
+						break;
+					}
+					pre.next = cur.next;
+					size--;
+					cur =cur.next;
+					if(cur == null){
+						break;
+					}
+				}
+				pre = pre.next;
+			}
+		}
 	}
 	
 	/**
@@ -266,7 +288,25 @@ public class LinkedList implements List {
 	 * @param max
 	 */
 	public void removeRange(int min, int max){
-		
+		if(head == null){
+			throw new RuntimeException("LinkedList is empty!");
+		}else{
+			Node q = head;
+			Node p = head.next;
+			while(p!=null){ 
+				if((int)p.data>min && (int)p.data<max){ 
+					q.next=p.next; 
+					size--;
+					p=q;
+					p=p.next;
+				}
+				else{
+					q=p;
+					p=p.next;
+					q=q.next;
+				} 
+			}
+		}
 	}
 	
 	/**
@@ -274,9 +314,37 @@ public class LinkedList implements List {
 	 * 现要求生成新链表C，其元素为当前链表和list中元素的交集，且表C中的元素有依值递增有序排列
 	 * @param list
 	 */
-	public LinkedList intersection( LinkedList list){
-		return null;
+	public LinkedList intersection(LinkedList list){
+		LinkedList linkedList = new LinkedList();
+		intersection(linkedList,this.head, list.head);
+		return linkedList;
 	}
+	
+	private void intersection(LinkedList linkedList, Node node1,Node node2){
+		if(node1 ==null && node2 == null){
+			
+		}else if(node1 == null){
+			while(node2 != null){
+				linkedList.add(node2.data);
+				node2 = node2.next;
+			}
+		}else if(node2 == null){
+			while(node1 != null){
+				linkedList.add(node1.data);
+				node1 = node1.next;
+			}
+		}else{
+			if((int)node1.data < (int)node2.data){
+				linkedList.add(node1.data);
+				intersection(linkedList,node1.next,node2);
+			}else{
+				//((int)node1.data > (int)node2.data)
+				linkedList.add(node2.data);
+				intersection(linkedList,node1, node2.next);
+			} 
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		LinkedList linkedList = new LinkedList();
