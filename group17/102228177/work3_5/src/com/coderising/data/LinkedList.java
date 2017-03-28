@@ -324,24 +324,24 @@ public class LinkedList implements List {
 		if(node1 ==null && node2 == null){
 			
 		}else if(node1 == null){
-			while(node2 != null){
-				linkedList.add(node2.data);
-				node2 = node2.next;
-			}
+			traverse(linkedList, node2);
 		}else if(node2 == null){
-			while(node1 != null){
-				linkedList.add(node1.data);
-				node1 = node1.next;
-			}
+			traverse(linkedList, node1);
 		}else{
 			if((int)node1.data < (int)node2.data){
 				linkedList.add(node1.data);
 				intersection(linkedList,node1.next,node2);
 			}else{
-				//((int)node1.data > (int)node2.data)
 				linkedList.add(node2.data);
 				intersection(linkedList,node1, node2.next);
 			} 
+		}
+	}
+
+	private void traverse(LinkedList linkedList, Node node) {
+		while(node != null){
+			linkedList.add(node.data);
+			node = node.next;
 		}
 	}
 	
