@@ -2,7 +2,7 @@ package com.coding.basic.linklist;
 
 /**
  * 用双向链表实现LRU算法
- * @author liuxin
+ * @author REEFE
  *
  */
 public class LRUPageFrame {
@@ -18,6 +18,7 @@ public class LRUPageFrame {
 	}
 
 	private int capacity;
+	private int currentSize = 0;
 	
 	
 	private Node first;// 链表头
@@ -37,11 +38,69 @@ public class LRUPageFrame {
 	 * @return
 	 */
 	public void access(int pageNum) {
+		if(currentSize==0){
+			Node node = new Node();
+			node.pageNum = pageNum;
+			node.prev = node.next = null;
+			first = last = node;
+			currentSize++;
+		}else{
+			if(first.pageNum == pageNum){
+				return ;
+			}
+			if(capacity==1){
+				addToFirst(pageNum);
+			}else{
+				 if(last.pageNum == pageNum) {
+					 moveLastToFirst();
+					 return ;
+				 }
+				 Node iteratorNode = first;
+			     while(iteratorNode.next != null && iteratorNode.pageNum != pageNum) {
+			    	 iteratorNode = iteratorNode.next;
+			     }
+			     if(iteratorNode == last) { 
+			          addToFirst(pageNum);
+			        //若缓存已满，移除最后一个节点
+			         if(currentSize > capacity) { 
+				           last = last.prev;
+				           last.next = null;
+			         }
+		         }else {
+		        	 moveToFirst(iteratorNode);
+	        	 }
+			}
+		}
 		
-	
 	}
-	
-	
+
+	private void moveToFirst(Node iteratorNode) {
+		iteratorNode.prev.next = iteratorNode.next;
+		iteratorNode.next.prev = iteratorNode.prev;
+		iteratorNode.prev = null;
+		iteratorNode.next = first;
+		first.prev = iteratorNode;
+		first = iteratorNode;
+	}
+
+	private void moveLastToFirst() {
+		last.next = first;
+		first.prev = last;
+		first = last;
+		last = last.prev;
+		last.next = null;
+		first.prev = null;
+	}
+
+	public void addToFirst(int pageNum) {
+		Node node = new Node();
+		node.pageNum = pageNum;
+		node.prev = null;
+		node.next = first;
+		first.prev = node;
+		first = node;
+		currentSize++;
+	}
 
 	public String toString(){
 		StringBuilder buffer = new StringBuilder();

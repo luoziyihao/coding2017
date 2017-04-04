@@ -14,7 +14,8 @@ import com.coderising.jvm.loader.ClassFileLoader;
 public class ClassFileloaderTest {
 
 	
-	static String path1 = "C:\\Users\\liuxin\\git\\coding2017\\liuxin\\mini-jvm\\bin";
+//	static String path1 = "C:\\Users\\liuxin\\git\\coding2017\\liuxin\\mini-jvm\\bin";
+	static String path1 = "D:\\git\\coding2017\\group17\\102228177\\work3_26\\bin";
 	static String path2 = "C:\temp";
 	
 	
