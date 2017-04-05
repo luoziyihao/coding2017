@@ -1,10 +1,4 @@
 package com.coding.basic.linklist;
-
-/**
- * 用双向链表实现LRU算法
- * @author REEFE
- *
- */
 public class LRUPageFrame {
 	
 	private static class Node {
@@ -18,15 +12,14 @@ public class LRUPageFrame {
 	}
 
 	private int capacity;
-	private int currentSize = 0;
 	
-	
+	private int currentSize;
 	private Node first;// 链表头
 	private Node last;// 链表尾
 
 	
 	public LRUPageFrame(int capacity) {
-		
+		this.currentSize = 0;
 		this.capacity = capacity;
 		
 	}
@@ -38,68 +31,107 @@ public class LRUPageFrame {
 	 * @return
 	 */
 	public void access(int pageNum) {
-		if(currentSize==0){
-			Node node = new Node();
+		
+		Node node = find(pageNum);
+		//在该队列中存在， 则提到队列头
+		if (node != null) {
+			
+			moveExistingNodeToHead(node);		
+			
+		} else{
+			
+			node = new Node();
 			node.pageNum = pageNum;
-			node.prev = node.next = null;
-			first = last = node;
-			currentSize++;
-		}else{
-			if(first.pageNum == pageNum){
-				return ;
-			}
-			if(capacity==1){
-				addToFirst(pageNum);
-			}else{
-				 if(last.pageNum == pageNum) {
-					 moveLastToFirst();
-					 return ;
-				 }
-				 Node iteratorNode = first;
-			     while(iteratorNode.next != null && iteratorNode.pageNum != pageNum) {
-			    	 iteratorNode = iteratorNode.next;
-			     }
-			     if(iteratorNode == last) { 
-			          addToFirst(pageNum);
-			        //若缓存已满，移除最后一个节点
-			         if(currentSize > capacity) { 
-				           last = last.prev;
-				           last.next = null;
-			         }
-		         }else {
-		        	 moveToFirst(iteratorNode);
-	        	 }
-			}
+			
+			// 缓存容器是否已经超过大小.
+			if (currentSize >= capacity) {			
+				removeLast();
+			} 
+			addNewNodetoHead(node);
 		}
+	}
+	
+	private void addNewNodetoHead(Node node) {
+		
+		if(isEmpty()){
+			
+			node.prev = null;
+			node.next = null;
+			first = node;
+			last = node;
+			
+		} else{
+			node.prev = null;
+			node.next = first;
+			first.prev = node;
+			first = node;
+		}
+		this.currentSize ++;
+	}
+
+	private Node find(int data){
+		
+		Node node = first;
+		while(node != null){
+			if(node.pageNum == data){
+				return node;
+			}
+			node = node.next;
+		}
+		return null;
 		
 	}
 
-	private void moveToFirst(Node iteratorNode) {
-		iteratorNode.prev.next = iteratorNode.next;
-		iteratorNode.next.prev = iteratorNode.prev;
-		iteratorNode.prev = null;
-		iteratorNode.next = first;
-		first.prev = iteratorNode;
-		first = iteratorNode;
+	
+
+	/**
+	 * 删除链表尾部节点 表示 删除最少使用的缓存对象
+	 */
+	private void removeLast() {
+		Node prev = last.prev;
+		prev.next = null;
+		last.prev = null;
+		last = prev;
+		this.currentSize --;
 	}
 
-	private void moveLastToFirst() {
-		last.next = first;
-		first.prev = last;
-		first = last;
-		last = last.prev;
-		last.next = null;
-		first.prev = null;
-	}
-
-	public void addToFirst(int pageNum) {
-		Node node = new Node();
-		node.pageNum = pageNum;
+	/**
+	 * 移动到链表头，表示这个节点是最新使用过的
+	 * 
+	 * @param node
+	 */
+	private void moveExistingNodeToHead(Node node) {
+		
+		if (node == first) {
+			
+			return;
+		}
+		else if(node == last){
+			//当前节点是链表尾， 需要放到链表头
+			Node prevNode = node.prev;
+			prevNode.next = null;	
+			last.prev = null;
+			last  = prevNode;				
+			
+		} else{
+			//node 在链表的中间， 把node 的前后节点连接起来
+			Node prevNode = node.prev;
+			prevNode.next = node.next;
+			
+			Node nextNode = node.next;
+			nextNode.prev = prevNode;
+			
+			
+		}
+		
 		node.prev = null;
 		node.next = first;
 		first.prev = node;
-		first = node;
-		currentSize++;
+		first = node;	
+		
+	}
+	private boolean isEmpty(){		
+		return (first == null) && (last == null);
 	}
 
 	public String toString(){
@@ -115,5 +147,4 @@ public class LRUPageFrame {
 		}
 		return buffer.toString();
 	}
-	
 }
