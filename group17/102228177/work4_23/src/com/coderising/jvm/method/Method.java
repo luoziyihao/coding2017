@@ -70,7 +70,25 @@ public class Method {
 	}
 	
 	public static Method parse(ClassFile clzFile, ByteCodeIterator iter){
-		return null;
+		int accessFlag = iter.nextU2ToInt();
+		int nameIndex = iter.nextU2ToInt();
+		int descriptorIndex = iter.nextU2ToInt();
+		int attributesCount = iter.nextU2ToInt();
+		Method m = new Method(clzFile, accessFlag, nameIndex, descriptorIndex);
+		
+		for (int i = 1; i <= attributesCount; i++) {
+			int attrNameIndex = iter.nextU2ToInt();	
+			String attrName = clzFile.getConstantPool().getUTF8String(attrNameIndex);
+			iter.back(2);
+			if(AttributeInfo.CODE.equalsIgnoreCase(attrName)){
+				CodeAttr codeAttr = CodeAttr.parse(clzFile, iter);
+				m.setCodeAttr(codeAttr);
+			} else{
+				throw new RuntimeException("only CODE attribute is implemented , please implement the "+ attrName);
+			}
+		}
+		
+		return m ;
 		
 	}
 

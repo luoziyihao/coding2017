@@ -23,7 +23,23 @@ public class LocalVariableTable extends AttributeInfo{
 	
 	public static LocalVariableTable parse(ByteCodeIterator iter){
 		
-		return null;
+		int index = iter.nextU2ToInt();
+		int len = iter.nextU4ToInt();
+		
+		LocalVariableTable table = new LocalVariableTable(index,len);
+		
+		int itemLen = iter.nextU2ToInt();
+		
+		for(int i=1; i<=itemLen; i++){
+			LocalVariableItem item = new LocalVariableItem();
+			item.setStartPC(iter.nextU2ToInt());
+			item.setLength(iter.nextU2ToInt());
+			item.setNameIndex(iter.nextU2ToInt());
+			item.setDescIndex(iter.nextU2ToInt());
+			item.setIndex(iter.nextU2ToInt());
+			table.addLocalVariableItem(item);
+		}
+		return table;
 	}
 	
 	

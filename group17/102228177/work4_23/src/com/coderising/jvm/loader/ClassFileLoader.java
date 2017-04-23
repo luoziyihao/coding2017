@@ -10,10 +10,6 @@ import java.util.List;
 
 import com.coderising.jvm.clz.ClassFile;
 
-
-
-
-
 public class ClassFileLoader {
 
 	private List<String> clzPaths = new ArrayList<String>();
