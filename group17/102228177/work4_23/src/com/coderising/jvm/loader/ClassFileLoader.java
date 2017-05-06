@@ -33,21 +33,7 @@ public class ClassFileLoader {
 		
 	}
 	
-	/*private byte[] loadClassFile(String clzFileName) {
-		
-		File f = new File(clzFileName);
-		
-		try {
-		
-			return IOUtils.toByteArray(new FileInputStream(f));
-			
-		} catch (IOException e) {			
-			e.printStackTrace();
-			return null;
-		}
-	}*/
-	
-	
+
 	
 	public void addClassPath(String path) {
 		if(this.clzPaths.contains(path)){
@@ -58,12 +44,6 @@ public class ClassFileLoader {
 		
 	}
 	
-	
-	
-	/*public String getClassPath(){
-		return StringUtils.join(this.clzPaths,";");
-	}
-*/
 	public ClassFile loadClass(String className) {
 		byte[] codes = this.readBinaryCode(className);
 		ClassFileParser parser = new ClassFileParser();
@@ -126,8 +106,5 @@ public class ClassFileLoader {
 		return null;
 		
 	}
-
-
-	
 
 }
