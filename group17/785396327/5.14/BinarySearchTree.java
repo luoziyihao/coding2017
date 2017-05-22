@@ -1,6 +1,8 @@
 import queue.Queue;
 import tree.BinaryTreeNode;
 
+import java.util.List;
+
 /**
  * Created by gongxun on 2017/5/15.
  */
@@ -214,5 +216,23 @@ public class BinarySearchTree<T extends Comparable> {
         return null;
     }
 
+
+    public List<T> levelVisit() {
+
+        return null;
+    }
+
+    public boolean isValid() {
+        return false;
+    }
+
+    public T getLowestCommonAncestor(T n1, T n2) {
+        return null;
+
+    }
+
+    public List<T> getNodesBetween(T n1, T n2) {
+        return null;
+    }
 
 }
