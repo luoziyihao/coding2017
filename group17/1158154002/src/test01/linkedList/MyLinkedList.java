@@ -100,33 +100,22 @@ public class MyLinkedList<T> implements Iterable<T> {
 	}
 
 	private Node<T> getNode(int idx) {
-//		Node<T> p;
-//		if (idx < 0 || idx > size()) {
-//			throw new IndexOutOfBoundsException();
-//		}
-//		if (idx < size() / 2) {
-//			p = beginMarker.next;
-//			for (int i = 0; i < idx; i++) {
-//				p = p.next;
-//			}
-//		} else {
-//			p = endMarker;
-//			for (int i = size(); i < idx; i--) {
-//				p = p.prev;
-//			}
-//		}
-//		
-        if (idx < (size() >> 1)) {
-            Node<T> p = beginMarker;
-            for (int i = 0; i < idx; i++)
-                p = p.next;
-            return p;
-        } else {
-            Node<T> p = endMarker;
-            for (int i = size() - 1; i > idx; i--)
-                p = p.prev;
-            return p;
-        }
+		Node<T> p;
+		if (idx < 0 || idx > size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (idx < size() / 2) {
+			p = beginMarker.next;
+			for (int i = 0; i < idx; i++) {
+				p = p.next;
+			}
+		} else {
+			p = endMarker;
+			for (int i = size(); i> idx; i--) {
+				p = p.prev;
+			}
+		}
+		return p;
 	}
 
 	public Iterator<T> iterator() {
