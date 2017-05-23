@@ -1,6 +1,7 @@
 import queue.Queue;
 import tree.BinaryTreeNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,26 +19,18 @@ public class BinarySearchTree<T extends Comparable> {
     }
 
     public T findMin() {
-//        if (root != null) {
-//            return getExtreme(false);
-//        }
-//        return null;
         return getExtremeRecursive(root, false);
     }
 
     public T findMax() {
-//        if (root != null) {
-//            return getExtreme(true);
-//        }
-//        return null;
         return getExtremeRecursive(root, true);
     }
 
     /**
      * 递归获取极值对应的节点
      *
-     * @param node
-     * @param isMax
+     * @param node  当前递归遍历到的节点
+     * @param isMax 是否取最大值     true    最大值    false   最小值
      * @return
      */
     private BinaryTreeNode<T> getExtremeNodeRecursive(BinaryTreeNode<T> node, boolean isMax) {
@@ -50,8 +43,8 @@ public class BinarySearchTree<T extends Comparable> {
     /**
      * 递归获取极值
      *
-     * @param node
-     * @param isMax
+     * @param node  当前递归遍历到的节点
+     * @param isMax 是否取最大值     true    最大值    false   最小值
      * @return
      */
     private T getExtremeRecursive(BinaryTreeNode<T> node, boolean isMax) {
@@ -62,7 +55,7 @@ public class BinarySearchTree<T extends Comparable> {
     }
 
     /**
-     * 获得极值
+     * 非递归获得极值
      *
      * @param isMax
      * @return
@@ -82,19 +75,57 @@ public class BinarySearchTree<T extends Comparable> {
         return extreme;
     }
 
+    /**
+     * 获得二叉树的深度
+     *
+     * @return
+     */
     public int height() {
         return maxHeight(root);
     }
 
-    private int maxHeight(BinaryTreeNode<T> root) {
-        if (root == null)
+    /**
+     * 递归获取二叉树的深度（高度）
+     *
+     * @param node
+     * @return
+     */
+    private int maxHeight(BinaryTreeNode<T> node) {
+        if (node == null)
             return 0;
-        int leftHeight = maxHeight(root.getLeft());
-        int rightHeight = maxHeight(root.getRight());
-        return leftHeight > rightHeight ? ++leftHeight : ++rightHeight;
+        int leftHeight = maxHeight(node.getLeft()) + 1;
+        int rightHeight = maxHeight(node.getRight()) + 1;
+        return leftHeight > rightHeight ? leftHeight : rightHeight;
     }
 
+    /**
+     * 获取二叉树节点个数
+     *
+     * @return
+     */
     public int size() {
+        return getSizeUseRecursion(root);
+    }
+
+    /**
+     * 递归获得二叉搜索树节点个数
+     *
+     * @param node
+     * @return
+     */
+    private int getSizeUseRecursion(BinaryTreeNode<T> node) {
+        if (node == null)
+            return 0;
+        else
+            return getSizeUseRecursion(node.getLeft()) + getSizeUseRecursion(node.getRight()) + 1;
+    }
+
+    /**
+     * 非递归实现获得二叉搜索树节点个数
+     *
+     * @return
+     */
+    private int getSizeNotUseRecursion() {
         if (root != null) {
             int size = 1;
             Queue<BinaryTreeNode<T>> queue = new Queue<BinaryTreeNode<T>>();
@@ -115,7 +146,51 @@ public class BinarySearchTree<T extends Comparable> {
         return -1;
     }
 
-    public void remove(T e) {
+    /**
+     * 递归实现删除节点
+     *
+     * @param e
+     */
+    public void removeUseRecursion(T e) {
+        remove(e, root);
+    }
+
+    private BinaryTreeNode<T> remove(T e, BinaryTreeNode<T> node) {
+        if (node == null)
+            return node;
+        int compareResult = e.compareTo(node.getData());
+        /**
+         * 在没有找到待删除节点时，一直递归查找，并将下一次查找的结果设置到当前节点中
+         */
+        if (compareResult > 0)
+            node.setRight(remove(e, node.getRight()));
+        else if (compareResult < 0)
+            node.setLeft(remove(e, node.getLeft()));
+        else {
+            //实际上执行到最后最先执行的是else里面的代码，表示找到了待删除节点
+            if (node.getLeft() != null && node.getRight() != null) {
+                /**
+                 * 待删除节点左右子树都存在
+                 */
+                //默认用待删除节点的右子树的最小值节点代替被删除节点
+                //因为此时node表示要删除的节点，因此要将替换节点的数据设置到要被删除的节点中
+                node.setData(new BinarySearchTree<T>(node.getRight()).findMin());
+                //上面一步只是替换了删除节点，还需要递归到替换的那个节点，将其作为要删除节点
+                node.setRight(remove(e, node.getRight()));
+            } else {
+                //统一处理左子节点和右子节点只存在一个或者都不存在的情况
+                node = (node.getLeft() == null) ? node.getRight() : node.getLeft();
+            }
+        }
+        return node;
+    }
+
+    /**
+     * 非递归实现删除节点
+     *
+     * @param e
+     */
+    public void removeNoUseRecursion(T e) {
         BinaryTreeNode<T> parent = findParent(root, e);
         if (parent == null)
             throw new RuntimeException("cannot remove non-exist node");
@@ -217,13 +292,58 @@ public class BinarySearchTree<T extends Comparable> {
     }
 
 
-    public List<T> levelVisit() {
+    /**
+     * 层级遍历
+     *
+     * @return
+     */
+    public List<Integer> levelVisit() {
+        if (root == null)
+            return null;
+        List<Integer> result = new ArrayList<Integer>();
+        Queue<BinaryTreeNode> queue = new Queue<BinaryTreeNode>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            BinaryTreeNode<Integer> node = (BinaryTreeNode<Integer>) queue.poll();
+            result.add(node.getData());
+            if (node.getLeft() != null)
+                queue.offer(node.getLeft());
+            if (node.getRight() != null)
+                queue.offer(node.getRight());
 
-        return null;
+        }
+        return result;
     }
 
+    /**
+     * 判断一个二叉树是不是二叉查找树
+     *
+     * @return
+     */
     public boolean isValid() {
-        return false;
+        return isBST(root);
+    }
+
+    private boolean isBST(BinaryTreeNode<T> node) {
+        if (node == null)
+            return true;
+        BinaryTreeNode<T> left = node.getLeft();
+        BinaryTreeNode<T> right = node.getRight();
+        boolean leftIsBST = true;
+        boolean rightIsBST = true;
+        if (left != null) {
+            if (left.getData().compareTo(node.getData()) >= 0)
+                leftIsBST = false;
+            else
+                leftIsBST = isBST(left);
+        }
+        if (right != null) {
+            if (right.getData().compareTo(node.getData()) <= 0)
+                rightIsBST = false;
+            else
+                rightIsBST = isBST(right);
+        }
+        return leftIsBST && rightIsBST;
     }
 
     public T getLowestCommonAncestor(T n1, T n2) {

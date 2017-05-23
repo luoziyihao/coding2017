@@ -1,7 +1,7 @@
 package tree;
 
 /**
- * Created by IBM on 2017/5/8.
+ * Created by gongxun on 2017/5/8.
  */
 public class BinaryTreeNode<T> {
     private T data;
