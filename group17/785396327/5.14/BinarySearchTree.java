@@ -317,42 +317,146 @@ public class BinarySearchTree<T extends Comparable> {
 
     /**
      * 判断一个二叉树是不是二叉查找树
+     * 思路：两个嵌套递归
+     * 1. 每一个节点都要比其左子节点大，比右子节点小
+     * 2. 每一个节点都要比其左子树中所有的节点大，并且要比其右子树中所有的节点小（不能使用数的最大或最小值判断）
      *
      * @return
      */
     public boolean isValid() {
-        return isBST(root);
+        return checkBST(root);
     }
 
-    private boolean isBST(BinaryTreeNode<T> node) {
+    /**
+     * 代表一个大递归
+     *
+     * @param node 当前节点
+     * @return
+     */
+    private boolean checkBST(BinaryTreeNode<T> node) {
         if (node == null)
             return true;
-        BinaryTreeNode<T> left = node.getLeft();
-        BinaryTreeNode<T> right = node.getRight();
-        boolean leftIsBST = true;
-        boolean rightIsBST = true;
-        if (left != null) {
-            if (left.getData().compareTo(node.getData()) >= 0)
-                leftIsBST = false;
-            else
-                leftIsBST = isBST(left);
-        }
-        if (right != null) {
-            if (right.getData().compareTo(node.getData()) <= 0)
-                rightIsBST = false;
-            else
-                rightIsBST = isBST(right);
-        }
-        return leftIsBST && rightIsBST;
+        return subTreeGreatThan(node.getRight(), node.getData())
+                && subTreeLessThan(node.getLeft(), node.getData())
+                && checkBST(node.getLeft())
+                && checkBST(node.getRight());
     }
 
+    /**
+     * 当前节点的值要比其右子树的所有节点都小
+     *
+     * @param rightChild 当前节点的右子节点
+     * @param currValue  当前节点的值
+     * @return
+     */
+    private boolean subTreeGreatThan(BinaryTreeNode<T> rightChild, T currValue) {
+        if (rightChild == null)
+            return true;
+        boolean isGreat = rightChild.getData().compareTo(currValue) > 0 ? true : false;
+        //递归实现右子节点的所有子树（包括左子树和右子树）都要比当前节点值大
+        boolean subGreat = subTreeGreatThan(rightChild.getLeft(), currValue);
+        boolean subLess = subTreeGreatThan(rightChild.getRight(), currValue);
+        return isGreat && subGreat && subLess;
+    }
+
+    /**
+     * 当前节点的值要比其左子树的所有节点都大
+     *
+     * @param leftChild 当前节点的左子节点
+     * @param currValue 当前节点的值
+     * @return
+     */
+    private boolean subTreeLessThan(BinaryTreeNode<T> leftChild, T currValue) {
+        if (leftChild == null)
+            return true;
+        boolean isLess = leftChild.getData().compareTo(currValue) < 0 ? true : false;
+        //递归实现左子树的所有子树（包括左子树和右子树）都要比当前节点小
+        boolean subGreat = subTreeLessThan(leftChild.getLeft(), currValue);
+        boolean subLess = subTreeLessThan(leftChild.getRight(), currValue);
+        return isLess && subGreat && subLess;
+    }
+
+    /**
+     * @param root
+     * @param min
+     * @param max
+     * @return
+     */
+    private boolean checkBST(BinaryTreeNode<T> root, T min, T max) {
+        if (root == null) return true;
+
+        if (root.getData().compareTo(min) <= 0 || root.getData().compareTo(max) >= 0)
+            return false;
+
+        if (!checkBST(root.getLeft(), min, root.getData()) || !checkBST(root.getRight(), root.getData(), max))
+            return false;
+
+        return true;
+    }
+
+    /**
+     * 寻找两个节点的最小公共祖先节点的值
+     * 思路：
+     * 1. 如果当前节点的值比两个节点的值都小，说明公共祖先在当前节点的右子树上
+     * 2. 如果当前节点的值比两个节点的值都大，说明公共祖先在当前节点的左子树上
+     * 3. 如果当前节点在两个节点的值区间之内，说明该节点就是公共祖先节点
+     *
+     * @param n1 其中一个节点的值
+     * @param n2 另一个节点的值
+     * @return
+     */
     public T getLowestCommonAncestor(T n1, T n2) {
-        return null;
+        return getLowestCommonAncestor(root, n1, n2);
 
     }
 
+    /**
+     * @param currentNode 当前递归遍历到的节点
+     * @param ele1        其中一个节点的值
+     * @param ele2        另一个节点的值
+     * @return
+     */
+    private T getLowestCommonAncestor(BinaryTreeNode<T> currentNode, T ele1, T ele2) {
+        if (currentNode == null)
+            return null;
+        T currentNodeData = currentNode.getData();
+        //因为对于二叉搜索树来说，只有三种可能，比两节点值都小；比两节点值都大；介于两者之间（不管是比其中哪个大，比其中哪个小）
+        if (currentNodeData.compareTo(ele1) > 0 && currentNodeData.compareTo(ele2) > 0)
+            return getLowestCommonAncestor(currentNode.getLeft(), ele1, ele2);
+        if (currentNodeData.compareTo(ele1) < 0 && currentNodeData.compareTo(ele2) < 0)
+            return getLowestCommonAncestor(currentNode.getRight(), ele1, ele2);
+        return currentNodeData;
+    }
+
+    /**
+     * 得到节点值介于n1和n2的所有节点集合
+     *
+     * @param n1 节点1的值
+     * @param n2 节点2的值
+     * @return
+     */
     public List<T> getNodesBetween(T n1, T n2) {
-        return null;
+        List<T> betweenNodes = new ArrayList<T>();
+        getNodesBetween(betweenNodes, root, n1, n2);
+        return betweenNodes;
+    }
+
+    private void getNodesBetween(List<T> betweenNodes, BinaryTreeNode<T> currentNode, T ele1, T ele2) {
+        //注意等于边界值的节点不放入结果集中
+        if (currentNode == null
+                || currentNode.getData().compareTo(ele1) == 0
+                || currentNode.getData().compareTo(ele2) == 0)
+            return;
+        T data = currentNode.getData();
+        if (data.compareTo(ele1) > 0 && data.compareTo(ele2) > 0)
+            getNodesBetween(betweenNodes, currentNode.getLeft(), ele1, ele2);
+        else if (data.compareTo(ele1) < 0 && data.compareTo(ele2) < 0)
+            getNodesBetween(betweenNodes, currentNode.getRight(), ele1, ele2);
+        else {
+            betweenNodes.add(data);
+            getNodesBetween(betweenNodes, currentNode.getLeft(), ele1, ele2);
+            getNodesBetween(betweenNodes, currentNode.getRight(), ele1, ele2);
+        }
     }
 
 }

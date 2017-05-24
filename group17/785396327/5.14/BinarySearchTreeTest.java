@@ -84,7 +84,29 @@ public class BinarySearchTreeTest {
     @Test
     public void testIsValid() {
         BinaryTreeNode<Integer> root = tree.getRoot();
+        root.getRight().setRight(new BinaryTreeNode<Integer>(10));
+        Assert.assertEquals(true, tree.isValid());
+
         root.getLeft().getLeft().setRight(new BinaryTreeNode<Integer>(7));
         Assert.assertSame(false, tree.isValid());
+
+    }
+
+    @Test
+    public void testLowestCommonAncestor() {
+        Integer lowestCommonAncestor = tree.getLowestCommonAncestor(1, 5);
+        Assert.assertEquals(2, lowestCommonAncestor.longValue());
+
+        lowestCommonAncestor = tree.getLowestCommonAncestor(3, 8);
+        Assert.assertEquals(6, lowestCommonAncestor.longValue());
+    }
+
+    @Test
+    public void testNodesBetween() {
+        List<Integer> nodesBetween = tree.getNodesBetween(1, 5);
+        Assert.assertEquals("[2, 4, 3]", nodesBetween.toString());
+
+        nodesBetween = tree.getNodesBetween(1, 10);
+        Assert.assertEquals("[6, 2, 4, 3, 8]", nodesBetween.toString());
     }
 }
