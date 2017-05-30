@@ -1,13 +1,13 @@
 package assignment0507;
 
 public class BinaryTreeNode<T> {
-	
-	private T data;
-	private BinaryTreeNode<T> left;
-	private BinaryTreeNode<T> right;
-	
-	public BinaryTreeNode(T data){
-		this.data=data;
+
+    public T data;
+    public BinaryTreeNode<T> left;
+    public BinaryTreeNode<T> right;
+
+    public BinaryTreeNode(T data) {
+        this.data=data;
 	}
 	public T getData() {
 		return data;
