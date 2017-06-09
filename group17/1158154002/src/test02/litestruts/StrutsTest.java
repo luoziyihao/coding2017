@@ -6,6 +6,10 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+
+
+
 public class StrutsTest {
 
 	@Test
@@ -25,7 +29,7 @@ public class StrutsTest {
 	}
 
 	@Test
-	public void testLoginActionFailed(){
+	public void testLoginActionFailed() {
 		String actionName = "login";
 		Map<String,String> params = new HashMap<String,String>();
         params.put("name","test");
