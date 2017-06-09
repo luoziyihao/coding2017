@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import tree.BinaryTreeNode;
 
+import java.util.List;
+
 /**
  * Created by gongxun on 2017/5/15.
  */
@@ -53,7 +55,7 @@ public class BinarySearchTreeTest {
 
     @Test
     public void testRemoveLeaf() {
-        tree.remove(4);
+        tree.removeUseRecursion(4);
         BinaryTreeNode<Integer> root = tree.getRoot();
         Assert.assertEquals(3, root.getLeft().getRight().getData().intValue());
 
@@ -61,7 +63,7 @@ public class BinarySearchTreeTest {
 
     @Test
     public void testRemoveMiddleNode() {
-        tree.remove(2);
+        tree.removeUseRecursion(2);
         BinaryTreeNode<Integer> root = tree.getRoot();
         Assert.assertEquals(3, root.getLeft().getData().intValue());
         Assert.assertEquals(4, root.getLeft().getRight().getData().intValue());
@@ -71,5 +73,40 @@ public class BinarySearchTreeTest {
     public void testFindParent() {
         BinaryTreeNode<Integer> node = tree.findParent(tree.getRoot(), 8);
         System.out.println(node);
+    }
+
+    @Test
+    public void testLevelVisit() {
+        List<Integer> integers = tree.levelVisit();
+        Assert.assertEquals("[6, 2, 8, 1, 4, 3]", integers.toString());
+    }
+
+    @Test
+    public void testIsValid() {
+        BinaryTreeNode<Integer> root = tree.getRoot();
+        root.getRight().setRight(new BinaryTreeNode<Integer>(10));
+        Assert.assertEquals(true, tree.isValid());
+
+        root.getLeft().getLeft().setRight(new BinaryTreeNode<Integer>(7));
+        Assert.assertSame(false, tree.isValid());
+
+    }
+
+    @Test
+    public void testLowestCommonAncestor() {
+        Integer lowestCommonAncestor = tree.getLowestCommonAncestor(1, 5);
+        Assert.assertEquals(2, lowestCommonAncestor.longValue());
+
+        lowestCommonAncestor = tree.getLowestCommonAncestor(3, 8);
+        Assert.assertEquals(6, lowestCommonAncestor.longValue());
+    }
+
+    @Test
+    public void testNodesBetween() {
+        List<Integer> nodesBetween = tree.getNodesBetween(1, 5);
+        Assert.assertEquals("[2, 4, 3]", nodesBetween.toString());
+
+        nodesBetween = tree.getNodesBetween(1, 10);
+        Assert.assertEquals("[6, 2, 4, 3, 8]", nodesBetween.toString());
     }
 }

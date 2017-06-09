@@ -1,7 +1,7 @@
 package tree;
 
 /**
- * Created by IBM on 2017/5/8.
+ * Created by gongxun on 2017/5/8.
  */
 public class BinaryTreeNode<T> {
     private T data;
@@ -42,6 +42,6 @@ public class BinaryTreeNode<T> {
 
     @Override
     public String toString() {
-        return "data : " + data + ", left data : " + left.getData() + ", right data : " + right.getData();
+        return "data : " + data + ", left data : " + (left == null ? "null" : left.getData()) + ", right data : " + (right == null ? "null" : right.getData());
     }
 }
